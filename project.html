@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedestrian Detection Project</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        pre {
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Pedestrian Detection Project</h1>
+    </header>
+    
+    <div class="container">
+        <section class="section">
+            <h2>Project Overview</h2>
+            <p>
+                This project involves developing a computer vision system to classify images of pedestrians into two categories: 
+                those on the road and those on the sidewalk. The system leverages Python and image processing techniques to 
+                achieve accurate classification. 
+            </p>
+        </section>
+        
+        <section class="section">
+            <h2>Objective</h2>
+            <p>
+                The goal of this project is to create an automated system that can distinguish between pedestrians on the road 
+                and those on the sidewalk. This has applications in autonomous driving and traffic monitoring systems.
+            </p>
+        </section>
+        
+        <section class="section">
+            <h2>Approach</h2>
+            <p>
+                We use a combination of deep learning techniques and image processing libraries to analyze and classify images. 
+                The key steps include:
+            </p>
+            <ul>
+                <li>Collecting and preprocessing image data.</li>
+                <li>Training a machine learning model to detect pedestrians.</li>
+                <li>Classifying the detected pedestrians based on their location (road vs. sidewalk).</li>
+            </ul>
+        </section>
+        
+        <section class="section">
+            <h2>Code Example</h2>
+            <p>Below is a sample of the Python code used for pedestrian detection:</p>
+            <pre><code>
+import cv2
+import numpy as np
+
+def detect_pedestrians(img_path):
+    # Load pre-trained YOLO model
+    net = cv2.dnn.readNet("yolov3.weights", "yolov3.cfg")
+    layer_names = net.getLayerNames()
+    output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+    
+    # Load image
+    img = cv2.imread(img_path)
+    height, width, channels = img.shape
+    
+    # Prepare the image for YOLO
+    blob = cv2.dnn.blobFromImage(img, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
+    net.setInput(blob)
+    outs = net.forward(output_layers)
+    
+    # Process detections
+    class_ids = []
+    confidences = []
+    boxes = []
+    
+    for out in outs:
+        for detection in out:
+            for obj in detection:
+                scores = obj[5:]
+                class_id = np.argmax(scores)
+                confidence = scores[class_id]
+                if confidence > 0.5 and class_id == 0:  # Class ID 0 is for 'person'
+                    center_x = int(obj[0] * width)
+                    center_y = int(obj[1] * height)
+                    w = int(obj[2] * width)
+                    h = int(obj[3] * height)
+                    x = int(center_x - w / 2)
+                    y = int(center_y - h / 2)
+                    
+                    b
